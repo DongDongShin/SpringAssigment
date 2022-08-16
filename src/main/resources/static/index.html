@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Assigment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        .mytitle {
+            width: 100%;
+            height: 250px;
+
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://movie-phinf.pstatic.net/20210715_95/1626338192428gTnJl_JPEG/movie_image.jpg');
+            background-position: center;
+            background-size: cover;
+
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mytitle > button {
+            width: 200px;
+            height: 50px;
+
+            background-color: transparent;
+            color: white;
+
+            border-radius: 50px;
+            border: 1px solid white;
+
+            margin-top: 10px;
+        }
+
+        .mytitle > button:hover {
+            border: 2px solid white;
+        }
+
+
+        .mycomment {
+            color: gray;
+            font-size: small;
+        }
+
+        .mycards {
+            margin: 20px auto 0px auto;
+            width: 95%;
+            max-width: 1200px;
+        }
+
+        .mypost {
+            width: 50%;
+            max-width: 500px;
+            margin: 20px auto 0px auto;
+            padding: 20px;
+            box-shadow: 0px 0px 3px 0px gray;
+
+            display: none;
+        }
+
+        .mybtns {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+
+            margin-top: 20px;
+        }
+
+        .mybtns > button {
+            margin-right: 10px;
+        }
+
+        card {
+            width: 538px;
+            border-radius: 5px;
+            background-color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .card .metadata {
+            position: relative;
+            display: flex;
+            font-family: 'Spoqa Han Sans';
+            font-size: 11px;
+            font-weight: normal;
+            font-stretch: normal;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: -0.77px;
+            text-align: left;
+            color: #adb5bd;
+            height: 14px;
+            padding: 10px 23px;
+        }
+
+        .card .metadata .date {
+
+        }
+
+        .card .metadata .username {
+            margin-left: 20px;
+        }
+
+        .contents {
+            padding: 0px 23px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .contents div.edit {
+            display: none;
+        }
+
+        .contents textarea.te-edit {
+            border-right: none;
+            border-top: none;
+            border-left: none;
+            resize: none;
+            border-bottom: 1px solid #212529;
+            width: 100%;
+            font-family: 'Spoqa Han Sans';
+        }
+
+        .footer {
+            position: relative;
+            height: 40px;
+        }
+
+        .footer img.icon-start-edit {
+            cursor: pointer;
+            position: absolute;
+            bottom: 14px;
+            right: 55px;
+            width: 18px;
+            height: 18px;
+        }
+
+        .footer img.icon-end-edit {
+            cursor: pointer;
+            position: absolute;
+            display: none;
+            bottom: 14px;
+            right: 55px;
+            width: 20px;
+            height: 15px;
+        }
+
+        .footer img.icon-delete {
+            cursor: pointer;
+            position: absolute;
+            bottom: 12px;
+            right: 19px;
+            width: 14px;
+            height: 18px;
+        }
+
+        #cards-box {
+            margin-top: 12px;
+        }
+    </style>
+    <script>
+        function open_box() {
+            $('#post-box').show()
+        }
+
+        function close_box() {
+            $('#post-box').hide()
+        }
+
+        $(document).ready(function () {
+            // HTML 문서를 로드할 때마다 실행합니다.
+            getMessages();
+        })
+
+        function getMessages() {
+            $('#cards-box').empty();
+            $.ajax({
+                type: 'GET',
+                url: '/api/information',
+                success: function (response) {
+                    for (let i = 0; i < response.length; i++) {
+                        let message = response[i];
+                        let title = message['title'];
+                        let username = message['name'];
+                        let contents = message['content'];
+                        let id = message['id'];
+                        let createdAt = message['createdAt'];
+                        addHTML(title, username, contents, createdAt, id);
+                    }
+                }
+            })
+        }
+
+        function editPost(id) {
+            showEdits(id);
+        }
+
+        function showEdits(id) {
+            $(`#${id}-contents`).hide();
+            $(`#${id}-edit2`).hide();
+            $(`#${id}-edit1`).show();//얘로 들어가는 거고 이제 이거를 누르면 비밀번호가 맞는 지!!!
+            $(`#${id}-cpasswordarea`).show();
+        }
+
+        function showEdits2(id) {
+            $(`#${id}-edit1`).hide();//얘로 들어가는 거고 이제 이거를 누르면 비밀번호가 맞는 지!!!
+            $(`#${id}-cpasswordarea`).hide();
+            //여기서 get방식으로 호출을 하고 맞으면 다음 단계 아니면 return
+            $(`#${id}-editarea`).show();
+            $(`#${id}-submit`).show();
+            $(`#${id}-delete`).show();
+        }
+        function is_right_password(id) {//여기에 들어가서 뭐 어떻게 해보면 될듯 합니다...
+            let password = $(`#${id}-correctarea`).val().trim();//바보 신동하
+            let data = {'password': password};
+            $.ajax({
+                type: "POST",
+                url: `/api/information/${id}`,
+                contentType: "application/json", // JSON 형식으로 전달함을 알리기
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if(response){
+                        alert('비밀번호가 맞습니다.');
+                        showEdits2(id);
+                    }
+                    else{
+                        alert('다시 입력해주세요.');
+                        return;
+                    }
+                }
+            });
+        }
+        function is_right_password2(id) {//여기에 들어가서 뭐 어떻게 해보면 될듯 합니다...
+            $(`#${id}-contents`).hide();
+            $(`#${id}-edit2`).hide();
+            $(`#${id}-edit1`).hide();//얘로 들어가는 거고 이제 이거를 누르면 비밀번호가 맞는 지!!!
+            $(`#${id}-cpasswordarea`).show();
+            let password = $(`#${id}-correctarea`).val().trim();//바보 신동하
+            console.log(password);
+            console.log(id);
+            let data = {'password': password};
+            $.ajax({
+                type: "POST",
+                url: `/api/information/${id}`,
+                contentType: "application/json", // JSON 형식으로 전달함을 알리기
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if(response){
+                        alert('비밀번호가 맞습니다');
+                        deleteOne(id);
+                    }
+                    else{
+                        return;
+                    }
+                }
+            });
+        }
+        function addHTML(title, username, contents, createdAt, id) {
+            let tempHtml = `<div class="card">
+        <!-- date/username 영역 -->
+        <div class="metadata">
+            <div class="date">
+                ${createdAt}
+            </div>
+            <div id="${id}-username" class="username">
+                ${username}
+            </div>
+        </div>
+        <div class="contents">
+            <div id="${id}-contents" class="text">
+                ${contents}
+            </div>
+             <div id="${id}-cpasswordarea" class="edit">
+                <textarea id="${id}-correctarea" class="te-edit" cols="10" rows="1" placeholder="비밀번호를 입력하세요!"></textarea>
+            </div>
+            <div id="${id}-editarea" class="edit">
+                <textarea id="${id}-titilearea" class="te-edit" cols="10" rows="1" placeholder="제목 변경"></textarea>
+                <textarea id="${id}-usernamearea" class="te-edit" cols="10" rows="1"placeholder="작성자명 변경"></textarea>
+                <textarea id="${id}-passwordarea" class="te-edit" cols="10" rows="1"placeholder="비밀번호 변경"></textarea>
+                <textarea id="${id}-contentarea" class="te-edit" cols="10" rows="1"placeholder="내용 변경"></textarea>
+            </div>
+        </div>
+        <!-- 버튼 영역-->
+        <div class="footer">
+            <img id="${id}-edit1" class="icon-start-edit" src="images/edit.png" alt="" onclick="is_right_password('${id}')">
+<!--            1이 비밀번호가 맞는지 확인하는거-->
+            <img id="${id}-edit2" class="icon-start-edit" src="images/edit.png" alt="" onclick="editPost('${id}')">
+<!--            창 열리게 하는 버튼-->
+            <img id="${id}-delete2" class="icon-delete" src="images/delete.png" alt="" onclick="is_right_password2('${id}')">
+            <img id="${id}-submit" class="icon-end-edit" src="images/done.png" alt="" onclick="submitEdit('${id}')">
+        </div>
+    </div>`
+            ;
+            // 2. #cards-box 에 HTML을 붙인다.
+            $('#cards-box').append(tempHtml);
+        }
+
+        function writePost() {
+            let contents = $('#comment').val();
+            let username = $('#username').val();
+            let title = $('#title').val();
+            let password = $('#password').val();
+            let data = {'name': username, 'content': contents, 'title': title, 'password': password};
+            $.ajax({
+                type: "POST",
+                url: "/api/information",
+                contentType: "application/json", // JSON 형식으로 전달함을 알리기
+                data: JSON.stringify(data),
+                success: function (response) {
+                    alert('메시지가 성공적으로 작성되었습니다.');
+                    window.location.reload();
+                }
+            });
+        }
+        function submitEdit(id) {
+            let title = $(`#${id}-titilearea`).val();
+            let username = $(`#${id}-usernamearea`).val();
+            let contents = $(`#${id}-contentarea`).val();
+            let password = $(`#${id}-passwordarea`).val();
+            let data = {'name': username, 'content': contents, 'title': title, 'password': password};
+            $.ajax({
+                type: "PUT",
+                url: `/api/information/${id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    alert('메시지 변경에 성공하였습니다.');
+                    window.location.reload();
+                }
+            });
+        }
+
+        function deleteOne(id) {
+            $.ajax({
+                type: "DELETE",
+                url: `/api/information/${id}`,
+                success: function (response) {
+                    alert('메시지 삭제에 성공하였습니다.');
+                    window.location.reload();
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<div class="mytitle">
+    <h1>Spring assigment</h1>
+    <button onclick="open_box()">게시물 작성하기</button>
+</div>
+<div class="mypost" id="post-box">
+    <div class="form-floating mb-3">
+        <input id="title" t class="form-control" placeholder="제목을 입력하세요.">
+        <label>제목</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input id="username" t class="form-control" placeholder="작성자명을 입력하세요.">
+        <label>작성자명</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input id="comment" class="form-control" placeholder="내용을 입력하세요">
+        <label>내용</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input id="password" class="form-control" placeholder="내용을 입력하세요">
+        <label>비밀번호</label>
+    </div>
+    <div class="mybtns">
+        <button onclick="writePost()" type="button" class="btn btn-dark">기록하기</button>
+        <button onclick="close_box()" type="button" class="btn btn-outline-dark">닫기</button>
+    </div>
+</div>
+
+<div class="mypost" id="post-box2">
+
+</div>
+
+<div id="cards-box" class="area-read">
+
+</div>
+</div>
+
+</div>
+</body>
+</html>
