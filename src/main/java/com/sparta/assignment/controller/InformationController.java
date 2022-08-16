@@ -2,6 +2,7 @@ package com.sparta.assignment.controller;
 import com.sparta.assignment.domain.Information;
 import com.sparta.assignment.domain.InformationRepository;
 import com.sparta.assignment.domain.InformationRequestDto;
+import com.sparta.assignment.domain.StringDto;
 import com.sparta.assignment.service.Informationservice;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.LazyToOne;
@@ -37,8 +38,8 @@ public class InformationController {
         return id;
     }
     @PostMapping("/api/information/{id}")
-    public Boolean modifyInformation(@PathVariable Long id ,@RequestBody Map<String,String> map) {
-        String password = map.get("password");
+    public Boolean modifyInformation(@PathVariable Long id , @RequestBody StringDto stringDto) {
+        String password = stringDto.getPassword();
         Optional<Information> information = informationRepository.findById(id);
         if(password.equals(information.get().getPassword())){
             return true;
